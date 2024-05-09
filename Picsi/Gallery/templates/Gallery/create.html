@@ -1,0 +1,19 @@
+{% extends 'Gallery/layout.html' %}
+{% load static %}
+
+{% block head %}
+<title>Create a new pic</title>
+{% endblock %}
+
+{% block body %}
+
+<div id="form-container">
+    <form action="." class="bg-light p-5" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <input class="btn btn-success" type="submit">
+    </form>
+</div>
+
+{% endblock %}
