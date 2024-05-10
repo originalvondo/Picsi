@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap');
 
 :root {
-    --pic-width: 260px;
+    --pic-width: 220px;
     --row-size: 10px;
     --pic-border-radius: 4px;
     --main-bg: #F6F5F2;
@@ -29,6 +29,7 @@ body {
 
 .pic {
     display: flex;
+    position: relative;
     justify-content: center;
     align-items: center;
     font-size: 3rem;
@@ -114,8 +115,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-image: url('./../../media/patterns.jpg');
+}
+
+.login-form-container {
+    height: 100vh;
+}
+
+.create-form-container{
+    height: 100vh;
 }
 
 nav {

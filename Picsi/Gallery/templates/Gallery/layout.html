@@ -16,9 +16,11 @@
 <body class="mt-2">
     <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'Gallery:home' %}"><img src="./../../media/Picsi.png" alt="Picsi Logo"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{% url 'Gallery:home' %}"><img src="./../../media/Picsi.png"
+                    alt="Picsi Logo"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -26,17 +28,24 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'Gallery:home' %}">Home</a>
                     </li>
+
+                    {% if request.user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'Gallery:create' %}">Add Pic</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Registration
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Login</a></li>
-                            <li><a class="dropdown-item" href="#">Signup</a></li>
+                            {% if request.user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'Accounts:logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'Accounts:login' %}">Login</a></li>
+                                <li><a class="dropdown-item" href="{% url 'Accounts:register' %}">Signup</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>

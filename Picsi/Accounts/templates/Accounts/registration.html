@@ -1,0 +1,31 @@
+{% extends "Gallery/layout.html" %}
+
+{% block head %}
+<title>Register</title>
+{% endblock %}
+
+{% block body %}
+<div id="form-container" class="mt-5">
+    <form id="registration-form" action="." method="post" class="bg-light p-5 m-5">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+
+            {% if field.errors %}   
+                {% for error in field.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary mt-3">Register</button>
+    </form>
+</div>
+{% endblock %}

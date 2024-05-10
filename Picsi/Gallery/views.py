@@ -3,6 +3,7 @@ from .models import Pic
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView
 from .forms import CreatePicForm
+from django.contrib import messages
 
 def index(request):
     pics = Pic.objects.all()
@@ -18,14 +19,31 @@ def pic(request, id):
 
 def delete_pic(request, id):
     pic = Pic.objects.get(pk=id)
-    if pic:
-        pic.delete()
-        return redirect(reverse("Gallery:home"))
-    else:
-        return redirect(reverse("Gallery:home"))
 
-class CreatePic(CreateView):
-    model = Pic
-    form_class = CreatePicForm
-    template_name = "Gallery/create.html"
-    success_url = reverse_lazy("Gallery:home")
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            pic.delete()
+            return redirect(reverse("Gallery:home"))
+        elif (request.user ==  pic.author):
+            pic.delete()
+            return redirect(reverse("Gallery:home"))
+        else:
+            messages.error(request, "My nigga, you cannot delete an image if you're not the author, or, you're not the superuser ;)")
+            return redirect(reverse("Gallery:home"))
+    else:
+        messages.error(request, "You need to be logged in to delete a Pic")
+        return redirect(reverse("Accounts:login"))
+
+def create_pic(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            form = CreatePicForm(request.POST, request.FILES)
+            if form.is_valid():
+                pic = form.save(commit=False)
+                pic.author = request.user
+                pic.save()
+                return redirect(reverse("Gallery:home"))
+    else:
+        form = CreatePicForm()
+
+    return render(request ,"Gallery/create.html", { "form": form })
