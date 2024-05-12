@@ -36,7 +36,13 @@ def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1'] 
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+
             return redirect(reverse("Gallery:home"))
     else:
         form = RegisterForm()
