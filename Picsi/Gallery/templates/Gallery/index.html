@@ -1,32 +1,45 @@
-{% extends 'Gallery/layout.html' %}
-{% load static %}
-
-{% block head %}
-    <link rel="icon" href="media/picsi_logo.png">
-    <title>Picsi</title>
-{% endblock %}
-
-{% block body %}
+{% extends 'Gallery/layout.html' %} {% load static %} {% block head %}
+<link rel="icon" href="media/picsi_logo.png" />
+<title>Picsi</title>
+{% endblock %} {% block body %}
 
 <div class="mt-5" id="container">
-    <div id="gallery">
-        {% for pic in pics%}
-        <div class="pic {{ pic.size }}">
-            <img src="{{ pic.image.url }}" alt="{{ pic.title }}" class="pic-img">
+  <div id="gallery">
 
-            <div class="pic-links">
-                <a class="pic-link pic-link-download" download href="{{ pic.image.url }}">Download</a>
-            </div>
-            
-            {% if request.user.is_authenticated %}
-                {% if request.user == pic.author or request.user.is_superuser %}
-                    <a class="pic-link pic-link-delete" href="{% url 'Gallery:delete' pic.id %}"><img style="height: 40px;" src="./../../media/delete.png" alt="Delete"></a>
-                {% endif %}
-            {% else %}
-            {% endif %}
+    {% for pic in pics %}
+        <div class="pic {{ pic.size }}">
+        <!-- Start with very low resolution -->
+        <img
+            src="{{ pic.very_low_res_image.url }}"
+            data-low-res="{{ pic.low_res_image.url }}"
+            data-mid-res="{{ pic.mid_res_image.url }}"
+            data-high-res="{{ pic.image.url }}"
+            alt="{{ pic.title }}"
+            class="pic-img progressive-img"
+        />
+
+        <div class="pic-links">
+            <a
+            class="pic-link pic-link-download"
+            download
+            href="{{ pic.image.url }}"
+            >Download</a
+            >
         </div>
-        {% endfor %}
-    </div>
+
+        {% if request.user.is_authenticated and request.user == pic.author %}
+            <a
+                class="pic-link pic-link-delete"
+                href="{% url 'Gallery:delete' pic.id %}"
+            >
+                <img style="height: 40px" src="./../../media/delete.png" alt="Delete" />
+            </a>
+        {% endif %}
+
+        </div>
+    {% endfor %}
+
+  </div>
 </div>
 
 {% endblock %}
