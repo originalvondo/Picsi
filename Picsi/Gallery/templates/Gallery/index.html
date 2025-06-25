@@ -27,7 +27,7 @@
             >
         </div>
 
-        {% if request.user.is_authenticated and request.user == pic.author %}
+        {% if request.user.is_authenticated and request.user == pic.author or request.user.is_superuser %}
             <a
                 class="pic-link pic-link-delete"
                 href="{% url 'Gallery:delete' pic.id %}"
