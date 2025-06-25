@@ -52,9 +52,9 @@ class Pic(models.Model):
                 getattr(self, field_name).save(filename, File(img_io), save=False)
 
         compressions = [
-            ("very_low_res_image", 10),  # very heavy compression
-            ("low_res_image",      20),  # heavy compression
-            ("mid_res_image",      40),  # medium compression
+            ("very_low_res_image", 20),  # very heavy compression
+            ("low_res_image",      40),  # heavy compression
+            ("mid_res_image",      70),  # medium compression
         ]
 
         # Process compressions in parallel
