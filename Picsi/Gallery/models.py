@@ -61,3 +61,13 @@ class Pic(models.Model):
 
         # 4) final save (update new fields)
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Remove associated image files
+        for field in ['image', 'very_low_res_image', 'low_res_image', 'mid_res_image']:
+            file_field = getattr(self, field)
+            if file_field and os.path.isfile(file_field.path):
+                os.remove(file_field.path)
+
+        # Call the parent class's delete method to remove the database record
+        super().delete(*args, **kwargs)
