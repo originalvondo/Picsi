@@ -105,45 +105,54 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const imgs = Array.from(document.querySelectorAll(".progressive-img"));
-        const loadImage = (img, res) => {
-          const src = img.dataset[res];
-          if (!src) return;
-          img.src = src;
-          img.removeAttribute(`data-${res}`);
+        const gallery = document.getElementById("gallery");
+        const images = Array.from(gallery.querySelectorAll(".progressive-img"));
+
+        const loadImageResolution = (img, resolution) => {
+          return new Promise((resolve) => {
+            const newSrc = img.dataset[resolution];
+            if (newSrc) {
+              const tempImg = new Image();
+              tempImg.src = newSrc;
+
+              tempImg.onload = () => {
+                img.src = newSrc; // Update to higher resolution
+                img.removeAttribute(`data-${resolution}`); // Clean up
+                resolve(); // Notify that this resolution is loaded
+              };
+
+              tempImg.onerror = () => resolve(); // Resolve on error to avoid blocking
+            } else {
+              resolve(); // If no resolution available, skip
+            }
+          });
         };
 
-        // Returns a promise that resolves once this img has loaded all tiers:
-        function progressivelyLoad(img) {
-          return new Promise((resolve) => {
-            // wait until it's in view
-            const obs = new IntersectionObserver(
-              (entries) => {
-                if (!entries[0].isIntersecting) return;
-                obs.unobserve(img);
+        const loadAllResolutionsForImage = async (img) => {
+          // Load low, then mid, then high resolution
+          await loadImageResolution(img, "lowRes");
+          await loadImageResolution(img, "midRes");
+          await loadImageResolution(img, "highRes");
+        };
 
-                // chain low→mid→high with delays
-                setTimeout(() => loadImage(img, "lowRes"), 0);
-                setTimeout(() => loadImage(img, "midRes"), 1000);
-                setTimeout(() => {
-                  loadImage(img, "highRes");
-                  resolve(); // we’re done with this img
-                }, 2000);
-              },
-              { threshold: 0.1 }
-            );
-
-            obs.observe(img);
+        // Observe all images for lazy-loading
+        const observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              loadAllResolutionsForImage(img); // Load resolutions asynchronously
+              observer.unobserve(img); // Stop observing after loading starts
+            }
           });
-        }
+        });
 
-        // run them in series:
-        (async () => {
-          for (let img of imgs) {
-            // ensure the image is in the DOM and waiting to intersect
-            await progressivelyLoad(img);
+        images.forEach((img) => {
+          if (img.complete) {
+            loadAllResolutionsForImage(img); // Load immediately if cached
+          } else {
+            observer.observe(img); // Otherwise, lazy-load
           }
-        })();
+        });
       });
     </script>
 
