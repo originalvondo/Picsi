@@ -3,6 +3,7 @@ from PIL import Image as PilImage, ImageOps
 from django.core.files import File
 from io import BytesIO
 from django.contrib.auth.models import User
+from concurrent.futures import ThreadPoolExecutor
 import os
 
 IMAGE_SIZES = [
@@ -33,18 +34,11 @@ class Pic(models.Model):
         if not self.pk:
             super().save(*args, **kwargs)
 
-        # 3) for each “res” slot, skip if already set, else re-save original pixels with different compression
-        compressions = [
-            ("very_low_res_image", 10),  # very heavy compression
-            ("low_res_image",      20),  # heavy compression
-            ("mid_res_image",      40),  # medium compression
-        ]
-
-        for field_name, quality in compressions:
+        # 3) Define tasks for multithreading
+        def generate_compressed_image(field_name, quality):
             if not getattr(self, field_name):
                 img_io = BytesIO()
 
-                # Preserve mode and format, just compress
                 if img.format == "PNG":
                     # PNG: keep transparency & original dimensions
                     img.save(img_io, format="PNG", optimize=True)
@@ -53,13 +47,21 @@ class Pic(models.Model):
                     rgb = img.convert("RGB")
                     rgb.save(img_io, format="JPEG", quality=quality, optimize=True)
 
-                # Rewind buffer
-                img_io.seek(0)
-
+                img_io.seek(0)  # Rewind buffer
                 filename = f"{field_name}_{os.path.basename(self.image.name)}"
                 getattr(self, field_name).save(filename, File(img_io), save=False)
 
-        # 4) final save (update new fields)
+        compressions = [
+            ("very_low_res_image", 10),  # very heavy compression
+            ("low_res_image",      20),  # heavy compression
+            ("mid_res_image",      40),  # medium compression
+        ]
+
+        # Process compressions in parallel
+        with ThreadPoolExecutor() as executor:
+            executor.map(lambda args: generate_compressed_image(*args), compressions)
+
+        # 4) Final save to update new fields
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
