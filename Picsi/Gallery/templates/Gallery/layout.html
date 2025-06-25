@@ -116,7 +116,7 @@
               tempImg.src = newSrc;
 
               tempImg.onload = () => {
-                img.src = newSrc; // Update to higher resolution
+                img.src = newSrc; // Update to the new resolution
                 img.removeAttribute(`data-${resolution}`); // Clean up
                 resolve(); // Notify that this resolution is loaded
               };
@@ -128,33 +128,34 @@
           });
         };
 
-        const loadAllResolutionsForImage = async (img) => {
-          // Load low, then mid, then high resolution
-          await loadImageResolution(img, "lowRes");
-          await loadImageResolution(img, "midRes");
-          await loadImageResolution(img, "highRes");
+        const loadPhase1 = () => {
+          // Load very low resolution for all images
+          return Promise.all(
+            images.map((img) => loadImageResolution(img, "veryLowRes"))
+          );
         };
 
-        // Observe all images for lazy-loading
-        const observer = new IntersectionObserver((entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const img = entry.target;
-              loadAllResolutionsForImage(img); // Load resolutions asynchronously
-              observer.unobserve(img); // Stop observing after loading starts
-            }
+        const loadPhase2 = () => {
+          // Load higher resolutions (low and mid) independently for each image
+          images.forEach((img) => {
+            const loadHigherResolutions = async () => {
+              await loadImageResolution(img, "lowRes");
+              await loadImageResolution(img, "midRes");
+            };
+            loadHigherResolutions();
           });
-        });
+        };
 
-        images.forEach((img) => {
-          if (img.complete) {
-            loadAllResolutionsForImage(img); // Load immediately if cached
-          } else {
-            observer.observe(img); // Otherwise, lazy-load
-          }
-        });
+        const initImageLoading = async () => {
+          // Phase 1: Ensure all images load in very low resolution
+          await loadPhase1();
+
+          // Phase 2: Start loading higher resolutions independently
+          loadPhase2();
+        };
+
+        initImageLoading();
       });
     </script>
-
   </body>
 </html>
