@@ -38,7 +38,12 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Run the application
+5. Collect static files
+```bash
+python manage.py collectstatic
+```
+
+6. Run the application
 ```bash
 python manage.py runserver
 ```
