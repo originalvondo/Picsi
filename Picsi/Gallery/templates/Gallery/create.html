@@ -4,6 +4,19 @@
 {% block head %}
 <link rel="icon" href="{% static 'Gallery/picsi_logo.png' %}">
 <title>Create a new pic</title>
+<style>
+  #image-preview {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  #image-preview img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -13,8 +26,34 @@
         {% csrf_token %}
 
         {{ form.as_p }}
+        <div id="image-preview"></div>
         <input class="btn btn-success" type="submit">
     </form>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('input[type="file"]');
+    const previewContainer = document.getElementById('image-preview');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+
+          reader.onload = function(e) {
+            previewContainer.innerHTML = `<img src="${e.target.result}" alt="Image preview">`;
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          previewContainer.innerHTML = '';
+        }
+      });
+    }
+  });
+</script>
 
 {% endblock %}
