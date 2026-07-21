@@ -31,9 +31,15 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-4. Run the application
+4. Make migrations to the sqlite database
 ```bash
 cd Picsi
+python manage.py makemigrations
+python manage.py migrate
+```
+
+5. Run the application
+```bash
 python manage.py runserver
 ```
 
