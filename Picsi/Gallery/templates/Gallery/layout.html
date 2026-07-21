@@ -18,9 +18,9 @@
   <body class="mt-2">
     <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'Gallery:home' %}"
-          ><img src="./../../media/Picsi.png" alt="Picsi Logo"
-        /></a>
+        <a class="navbar-brand" href="{% url 'Gallery:home' %}">
+          <img src="{% static 'Gallery/Picsi.png' %}" alt="Picsi Logo" />
+        </a>
         <button
           class="navbar-toggler"
           type="button"

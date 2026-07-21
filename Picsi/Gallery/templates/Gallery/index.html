@@ -1,5 +1,5 @@
 {% extends 'Gallery/layout.html' %} {% load static %} {% block head %}
-<link rel="icon" href="media/picsi_logo.png" />
+<link rel="icon" href="{% static 'Gallery/picsi_logo.png' %}" />
 <title>Picsi</title>
 {% endblock %} {% block body %}
 
@@ -32,7 +32,7 @@
                 class="pic-link pic-link-delete"
                 href="{% url 'Gallery:delete' pic.id %}"
             >
-                <img style="height: 40px" src="./../../media/delete.png" alt="Delete" />
+                <img style="height: 40px" src="{% static 'Gallery/delete.png' %}" alt="Delete" />
             </a>
         {% endif %}
 
